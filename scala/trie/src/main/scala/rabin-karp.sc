@@ -1,7 +1,6 @@
 class RabinKarp(text: String) {
   val R = 256
   val q = 2147483647
-  // this is prime
   val chars = text.toCharArray
 
   def hash(string: String): Int = string.foldLeft(0)((acc, char) => (R * acc + char) % q)
@@ -11,12 +10,12 @@ class RabinKarp(text: String) {
   def search(pat: String): List[Int] = {
     val pHash = hash(pat)
     val m = pat.length
-    val t0 = hash(text.substring(0, m))
+    val t0 = if (m > chars.length) 0 else hash(text.substring(0, m))
     val h = calcH(pat.length)
     val max = chars.length - m
 
     def loop(num: Int, tHash: Int, locations: List[Int]): List[Int] =
-      if (num == chars.length - m) {
+      if (num >= chars.length - m) {
         if (pHash == tHash && text.slice(num, num + m) == pat) num :: locations
         else locations
       } else {
@@ -27,14 +26,13 @@ class RabinKarp(text: String) {
         )
       }
 
-    loop(0, t0, Nil)
+    loop(0, t0, Nil).reverse
   }
 }
 
 
 val rk = new RabinKarp("abaabbcab")
 rk.search("ab")
-rk.hash("a")
-
-Array('a', 'b', 'c').slice(0, 2)
+rk.search("bc")
+rk.search("aaaaaaaaaaaaaaaaaaaa")
 
