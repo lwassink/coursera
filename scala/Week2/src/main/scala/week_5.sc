@@ -85,7 +85,7 @@ def transform[T, U](xs: List[T])(f: T => U): List[U] = xs match {
   case y :: ys => f(y) :: transform(ys)(f)
 }
 
-def reduce[T](xs: List[T], acc: T)(f: (T, T) => T): T = xs match {
+def reduce[T, U](xs: List[T], acc: U)(f: (U, T) => U): U = xs match {
   case Nil => acc
   case y :: ys => reduce(ys, f(acc, y))(f)
 }
@@ -116,3 +116,11 @@ def encode[T](xs: List[T]): List[(T, Int)] =
 
 
 encode(List("a", "a", "a", "b", "c", "c", "a"))
+
+def reduceRight[T, U](xs: List[T], acc: U)(f: (T, U) => U): U = xs match {
+  case Nil => acc
+  case y :: ys => f(y, reduceRight(ys, acc)(f))
+}
+
+val list = List("a", "a", "a")
+reduce[String, String](list, "")(_ ++ _)

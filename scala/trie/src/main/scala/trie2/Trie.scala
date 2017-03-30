@@ -5,10 +5,10 @@ package trie2
   */
 class Trie[Value >: Null] {
   private val R = 256
-  private var root = new Node[Value](null)
+  private var root = new Node(null)
 
-  private class Node[Value](val value: Value, val children: Array[Node[Value]]) {
-    def this(value: Value) = this(value, new Array[Node[Value]](256))
+  private case class Node(val value: Value, val children: Array[Node]) {
+    def this(value: Value) = this(value, new Array[Node](256))
   }
 
   def get(key: String): Value = {
@@ -17,7 +17,7 @@ class Trie[Value >: Null] {
     else x.value
   }
 
-  private def get(key: String, node: Node[Value], pos: Integer): Node[Value] =
+  private def get(key: String, node: Node, pos: Integer): Node =
     if (node == null) null
     else if (pos == key.length()) node
     else get(key, node.children(key.charAt(pos)), pos + 1)
@@ -27,25 +27,33 @@ class Trie[Value >: Null] {
     null
   }
 
-  private def put(key: String, value: Value, node: Node[Value], pos: Integer): Node[Value] = {
+  private def put(key: String, value: Value, node: Node, pos: Integer): Node = {
     if (pos == key.length()) {
       if (node == null) new Node(value)
       else new Node(value, node.children)
     } else {
       val c = key.charAt(pos)
-      val newChildren = new Array[Node[Value]](256)
+      val newChildren = new Array[Node](256)
       if (node != null) Array.copy(node.children, 0, newChildren, 0, 256)
       newChildren(c) = put(key, value, newChildren(c), pos + 1)
 
       val newValue = if (node == null) null else node.value
-      new Node[Value](newValue, newChildren)
+      new Node(newValue, newChildren)
     }
   }
 
-  def keys(node: Node[Value]): List[String] = {
-    def collect(node: Node[Value], pre: String): List[String] = node match
+  def keys: List[String] = keysWithPrefix("")
 
-    collect(root, "")
+  def keysWithPrefix(pre: String): List[String] = collect(get(pre, root, 0), pre)
+
+  def collect(x: Node, pre: String): List[String] = {
+    def loopThroughChildren(char: Int): List[String] =
+      if (char >= R) Nil
+      else collect(x.children(char), pre + char.asInstanceOf[Char]) ++ loopThroughChildren(char + 1)
+
+    if (x == null) Nil
+    else if (x.value == null)   loopThroughChildren(0)
+    else                        pre :: loopThroughChildren(0)
   }
 }
 
@@ -55,6 +63,7 @@ object Main extends App {
   t.put("monkey", "judith")
   t.put("monktoon", "lilith")
   t.put("app", "awesome")
+  t.put("molo", "pink")
 
   println(t.get("m"))
   println(t.get("mo"))
@@ -63,4 +72,8 @@ object Main extends App {
   println(t.get("monke"))
   println(t.get("monkey"))
   println(t.get("mpp"))
+  println(t.keys)
+  println(t.keysWithPrefix("m"))
+  println(t.keysWithPrefix("mo"))
+  println(t.keysWithPrefix("monk"))
 }
