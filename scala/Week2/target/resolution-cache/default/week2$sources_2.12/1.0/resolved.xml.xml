@@ -4,7 +4,7 @@
 		module="week2$sources_2.12"
 		revision="1.0"
 		status="integration"
-		publication="20170303151700"
+		publication="20170331140808"
 	/>
 	<configurations>
 		<conf name="compile" visibility="public" description=""/>

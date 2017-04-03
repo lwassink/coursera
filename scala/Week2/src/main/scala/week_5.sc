@@ -124,3 +124,9 @@ def reduceRight[T, U](xs: List[T], acc: U)(f: (T, U) => U): U = xs match {
 
 val list = List("a", "a", "a")
 reduce[String, String](list, "")(_ ++ _)
+
+val x = Map((1, 2))
+x(1)
+val y = x + (1 -> 3)
+x
+y
